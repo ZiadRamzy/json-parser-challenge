@@ -5,13 +5,13 @@ from typing import NoReturn
 
 def validate_json(file_path: str) -> NoReturn:
     """
-    Validate a JSON file.
+    Validate a JSON file containing a simple JSON object with string keys and values.
 
     Args:
         - file_path (str): Path to the JSON file to validate.
     
     Output:
-        - Prints "Valid JSON object" and exits with code 0 if the JSON is valid.
+        - Prints "Valid JSON object with string keys and values" and exits with code 0 if the JSON is valid.
         - Prints "Invalid JSON: <error_message>" and exits with code 1 if invalid.
     """
 
@@ -24,8 +24,11 @@ def validate_json(file_path: str) -> NoReturn:
             data = json.loads(content)
 
             if isinstance(data, dict):
-                print("Valid JSON object")
-                sys.exit(0)
+                if all(isinstance(key, str) and isinstance(value, str) for key, value in data.items()):
+                    print("Valid JSON object with string keys and values")
+                    sys.exit(0)
+                else:
+                    raise ValueError("Non-string keys or values present")
             else:
                 raise ValueError("Not a JSON object")
     except (json.JSONDecodeError, ValueError) as error:
@@ -37,7 +40,7 @@ if __name__ == '__main__':
     import argparse
 
     # setting up argument parsing for the file input
-    parser = argparse.ArgumentParser(description="Simple JSON Parser")
+    parser = argparse.ArgumentParser(description="JSON Parser for string key-value pairs")
     parser.add_argument("file", type=str, help="Path to the JSON file to validate")
     args = parser.parse_args()
 
