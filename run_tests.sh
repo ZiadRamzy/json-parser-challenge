@@ -39,3 +39,13 @@ for file in tests/step4/*.json; do
     echo "Exit code: $?"
     echo "------------------------"
 done
+
+# Run tests for Step 5
+echo "Running custom tests for Step 5:"
+# Loop through all valid and invalid files
+for file in tests/step5/*.json; do
+    echo "Testing $file"
+    python parser.py "$file"
+    echo "Exit code: $?"
+    echo "------------------------"
+done
