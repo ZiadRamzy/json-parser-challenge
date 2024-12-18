@@ -1,0 +1,9 @@
+{
+    "key1": "string",
+    "key2": 123,
+    "key3": null,
+    "key4": false,
+    "key5": [1, "two", true],
+    "key6": {"subkey": "subvalue"}
+  }
+  
