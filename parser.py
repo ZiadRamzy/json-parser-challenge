@@ -1,11 +1,12 @@
 import json
 import sys
-from typing import NoReturn
+from typing import Any, NoReturn
 
 
 def validate_json(file_path: str) -> NoReturn:
     """
-    Validate a JSON file containing a simple JSON object with string keys and values.
+    Validates a JSON file containing a JSON object with various value types,
+    including nested objects and arrays.
 
     Args:
         - file_path (str): Path to the JSON file to validate.
@@ -24,23 +25,55 @@ def validate_json(file_path: str) -> NoReturn:
             data = json.loads(content)
 
             if isinstance(data, dict):
-                if all(isinstance(key, str) and isinstance(value, str) for key, value in data.items()):
-                    print("Valid JSON object with string keys and values")
+                if all(validate_value(value) for value in data.values()):
+                    print("Valid JSON object with nested objects and arrays")
                     sys.exit(0)
                 else:
-                    raise ValueError("Non-string keys or values present")
+                    raise ValueError("Invalid value types found in JSON object")
             else:
                 raise ValueError("Not a JSON object")
+            
     except (json.JSONDecodeError, ValueError) as error:
         print("Invalid JSON", str(error))
         sys.exit(1)
+
+def validate_value(value: Any) -> bool:
+    """
+    Recursively validates that a value is one of the allowed JSON types:
+    - String
+    - Number (int or float)
+    - Boolean
+    - Null (None)
+    - Object (dict)
+    - Array (list)
+
+    Args:
+        value (Any): The value to validate.
+    
+    Returns:
+        bool: True if the value is valid, False otherwise.
+    """
+
+    valid_primitive_types = (str, int, float, bool, type(None))
+
+    if isinstance(value, valid_primitive_types):
+        return True
+    elif isinstance(value, dict):
+        # Recursively validate each value in the nested object
+        return all(validate_value(v) for v in value.values())
+    elif isinstance(value, list):
+        # Recursively validate each item in the list
+        return all(validate_value(item) for item in value)
+    else:
+        # Invalid types found
+        return False
 
 
 if __name__ == '__main__':
     import argparse
 
     # setting up argument parsing for the file input
-    parser = argparse.ArgumentParser(description="JSON Parser for string key-value pairs")
+    parser = argparse.ArgumentParser(description="JSON Parser for nested objects and arrays")
     parser.add_argument("file", type=str, help="Path to the JSON file to validate")
     args = parser.parse_args()
 
